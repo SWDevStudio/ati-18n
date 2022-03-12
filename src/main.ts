@@ -3,6 +3,9 @@ import { prompt } from 'inquirer'
 import chalk from 'chalk'
 import fs from 'fs'
 import Writer from "./classes/Writer";
+import {Itranslitor} from "./interface/Itranslitor";
+import Google from "./classes/Google";
+import Yandex from "./classes/Yandex";
 
 const commander = program
 commander
@@ -75,11 +78,21 @@ commander
 commander
   .command('translate')
   .action(() => {
-      const writer = new Writer('en', 'ru', {
-        pathRead: 'jsons/ru.json'
-      })
+    const from = 'eu'
+    const to = 'ru'
 
-    console.log(writer)
+    const writer = new Writer({
+      pathRead: './jsons/en.json'
+    })
+
+
+    const translators: Itranslitor[] = [
+      new Google(from,to),
+      new Yandex(from, to)
+    ]
+
+    // Теперь нужно пройтись по JSON файлу рекурсивно и заменить все значения в ключах.
+    const realFile = writer.readFile()
   })
 
 
