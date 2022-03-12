@@ -2,9 +2,9 @@ import { program } from 'commander'
 import { prompt } from 'inquirer'
 import chalk from 'chalk'
 import fs from 'fs'
+import Writer from "./classes/Writer";
 
 const commander = program
-
 commander
   .version('1.0.0')
   .description('Котики захватят мир')
@@ -71,19 +71,15 @@ commander
     }
   })
 
+
 commander
-  .command('all')
-  .alias('a')
-  .description('Show all configuration files.')
+  .command('translate')
   .action(() => {
-    const files = fs.readdirSync('files')
+      const writer = new Writer('en', 'ru', {
+        pathRead: 'jsons/ru.json'
+      })
 
-    let data = ''
-    for (let file of files) data += `${file} \n`
-
-    console.log(
-      chalk.grey(`\nConfiguration files: \n\n${data}`)
-    )
+    console.log(writer)
   })
 
 
