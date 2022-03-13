@@ -14,72 +14,9 @@ commander
   .description('Котики захватят мир')
 
 commander
-  .command('create <name>')
-  .option('--extension <value>', 'File extension')
-  .alias('c')
-  .description('Котики захватят мир')
-  .action((name, cmd) => {
-    if (
-      cmd.extension &&
-      !['json', 'txt', 'cfg'].includes(cmd.extension)
-    ) {
-      console.log(chalk.red('\nExtension is not allowed.'))
-    } else {
-      prompt([
-        {
-          type: 'input',
-          name: 'charset',
-          message: 'Charset: ',
-        },
-        {
-          type: 'input',
-          name: 'max_ram_usage',
-          message: 'Max RAM usage, Mb: ',
-        },
-        {
-          type: 'input',
-          name: 'max_cpu_usage',
-          message: 'Max CPU usage, %: ',
-        },
-        {
-          type: 'input',
-          name: 'check_updates_interval',
-          message: 'Updates interval, ms: ',
-        },
-        {
-          type: 'input',
-          name: 'processes_count',
-          message: 'Processes count: ',
-        },
-      ]).then((options) => {
-        if (cmd.extension && cmd.extension === 'json') {
-          fs.writeFileSync(
-            `${name}.${cmd.extension}`,
-            JSON.stringify(options)
-          )
-        } else {
-          let data = ''
-          for (let item in options)
-            data += `${item}=${options[item]} \n`
-
-          fs.writeFileSync(`${name}.cfg`, data)
-        }
-        console.log(
-          chalk.green(
-            `\nFile "${name}.${
-              cmd.extension || 'cfg'
-            }" created.`
-          )
-        )
-      })
-    }
-  })
-
-
-commander
   .command('translate <from> <to>')
   .description('Создает новый файл с текстами для перевода.')
-  .action((from, to) => {
+  .action(async (from, to) => {
     console.log(from, to)
     const writer = new Writer({
       pathRead: './jsons/en.json'
@@ -93,10 +30,11 @@ commander
 
     const realFile = writer.readFile()
 
-    FileGenerator(realFile, translators).then(r => {
-      //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
-      writer.writeFile('test', r)
-    })
+    const file = await FileGenerator(realFile, translators)
+
+    //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
+    writer.writeFile('test', file)
+
   })
 
 
