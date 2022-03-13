@@ -104,7 +104,7 @@ commander
         if ( typeof object[item] === 'object') {
           file[item] = await fileGenerator(object[item])
         } else {
-          const str: string = object[item]
+          let str: string = object[item]
 
           const translates = await Promise.all(translators.map(i => i.translate(str)))
           const coincidence = (arr: string[]) => [...new Set(translates.map(i => i.value))]
@@ -112,13 +112,27 @@ commander
 
           // Проверить расхождение переводов если различаются,
           if (isNotCoincidence.length > 1) {
+            const customTranslate = 'Свой вариант'
             const response = await prompt({
               type: 'list',
               message: 'Конфликт переводов, выберете подходящий для вас',
               name: 'selected',
-              choices: translates.map(i => `${i.translator}: ${i.value}`),
+              choices: [...translates.map(i => `${i.translator}: ${i.value}`), customTranslate],
             })
 
+
+
+            if (response.selected === customTranslate) {
+              const response = await prompt({
+                type: 'input',
+                message: 'Введите свой вариант:',
+                name: 'input'
+              })
+
+              str = response.input
+            } else {
+              str = response.selected
+            }
             // проработать если не один вариант не нравится.
           }
 
