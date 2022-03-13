@@ -93,6 +93,45 @@ commander
 
     // Теперь нужно пройтись по JSON файлу рекурсивно и заменить все значения в ключах.
     const realFile = writer.readFile()
+    const fileGenerator = async (object: any) => {
+      const file: any = {}
+
+      const ignoredWord = '%'
+      const startInterpolation = '{{'
+      const endInterpolation = '}}'
+
+      for (let item in object) {
+        if ( typeof object[item] === 'object') {
+          file[item] = await fileGenerator(object[item])
+        } else {
+          const str: string = object[item]
+
+          const translates = await Promise.all(translators.map(i => i.translate(str)))
+          const coincidence = (arr: string[]) => [...new Set(translates.map(i => i.value))]
+          const isNotCoincidence = coincidence(translates)
+
+          // Проверить расхождение переводов если различаются,
+          if (isNotCoincidence.length > 1) {
+            const response = await prompt({
+              type: 'list',
+              message: 'Конфликт переводов, выберете подходящий для вас',
+              name: 'selected',
+              choices: translates.map(i => `${i.translator}: ${i.value}`),
+            })
+
+            // проработать если не один вариант не нравится.
+          }
+
+          file[item] = str
+        }
+      }
+
+      return file
+    }
+
+    fileGenerator(realFile).then(r => {
+      writer.writeFile('test', r)
+    })
   })
 
 

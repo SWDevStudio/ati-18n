@@ -5,6 +5,7 @@ import axios from "axios";
 
 export default class Google extends Translator implements Itranslitor{
   axios: AxiosInstance
+  name = 'Google'
 
   constructor(langFrom: string, langTo: string) {
     super(langFrom, langTo)
@@ -12,7 +13,10 @@ export default class Google extends Translator implements Itranslitor{
   }
 
 
-  async translate(): Promise<string> {
-    return ''
+  async translate(string: string): Promise<{translator: string, value: string}> {
+    return {
+      translator: this.name,
+      value: string
+    }
   }
 }
