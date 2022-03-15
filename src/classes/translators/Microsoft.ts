@@ -4,6 +4,12 @@ import {AxiosInstance, AxiosResponse} from "axios";
 import axios from "axios";
 import {Json} from "../../types/Json";
 import {Responses} from "../../interface/Responses";
+// @ts-ignore
+import setPath from 'object-path-set'
+type RequestMicrosoft = {
+  text: string
+  key: string
+}
 
 export default class Microsoft extends Translator implements Itranslitor {
   axios: AxiosInstance;
@@ -33,15 +39,52 @@ export default class Microsoft extends Translator implements Itranslitor {
     // Нужно сгенерировать data объект для API
     // После чего нужно получить ответ и собрать объект заново.
     // Далее возвращаем объект в едином виде для всего.
+    const translateObject: RequestMicrosoft[] = this._dataGenerator()
 
     // Возможно у некоторых API есть сразу перевод объект, что позволит не писать прослойку => нужно проверить есть ли такое в Microsoft
-    const response: AxiosResponse<Responses.Microsoft[]> = await this.axios.post('/translate', this._dataGenerator())
-
-    console.log(response.data[0].translations)
-    return {}
+    const response: AxiosResponse<Responses.Microsoft[]> = await this.axios.post('/translate', translateObject)
+    const needArr = response.data.map(i => i.translations).flat()
+    return this._toJson(translateObject, needArr)
   }
 
-  protected _dataGenerator(): object {
-    return [{text: 'Как дела 12?'}, {text: 'kotaro'}]
+
+  protected _dataGenerator(): RequestMicrosoft[] {
+    const arr: RequestMicrosoft[] = []
+    const generator = (obj: any, key?: string) => {
+      for (let item in obj) {
+        if (typeof obj[item] === 'object') {
+          generator(obj[item], item)
+        } else {
+          arr.push({text: obj[item], key: key ? `${key}.${item}` : item})
+        }
+      }
+    }
+    generator(this.targetJson, '')
+    return arr
   }
+
+  protected _toJson(generatedData: RequestMicrosoft[], response: Responses.Microsoft['translations']): Json {
+    const setKeyForResponse: RequestMicrosoft[] = response.map((i, k) => {
+      return {
+        text: i.text,
+        key: generatedData[k].key
+      }
+    })
+    const obj: Json = {}
+    setKeyForResponse.forEach((i) => {
+      setPath(obj, i.key, i.text)
+    })
+    return obj
+  }
+
+  // GetByPath(obj: any, path: any) {
+  //   let parts = path.split(".");
+  //   let current = obj;
+  //   for (let i = 0; i < parts.length; i++) {
+  //     current = current[parts[i]];
+  //     if (!current)
+  //       break;
+  //   }
+  //   return current;
+  // }
 }

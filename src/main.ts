@@ -24,7 +24,7 @@ commander
     const realFile = writer.readFile()
 
     const translators: Itranslitor[] = [
-      new Microsoft('ru', 'en', realFile)
+      new Microsoft(from, to, realFile)
     ]
 
     const result: Json[] = await Promise.all(
@@ -35,7 +35,7 @@ commander
     // const file = await FileGenerator(realFile, translators)
     //
     // //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
-    // writer.writeFile('test', file)
+    writer.writeFile('test', result[0])
 
   })
 
