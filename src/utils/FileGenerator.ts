@@ -1,7 +1,11 @@
 import {prompt} from "inquirer";
 import {Itranslitor} from "../interface/Itranslitor";
+import {Json} from "../types/Json";
 
-export default async function FileGenerator(object: any, translators: Itranslitor[])  {
+/**
+ * @deprecated
+ */
+export default async function FileGenerator(object: any, translators: any[])  {
   const file: any = {}
 
   const ignoredWord = '%'
@@ -14,8 +18,8 @@ export default async function FileGenerator(object: any, translators: Itranslito
     } else {
       let str: string = object[item]
 
-      const translates = await Promise.all(translators.map(i => i.translate(str)))
-      const coincidence = (arr: string[]) => [...new Set(translates.map(i => i.value))]
+      const translates = await Promise.all(translators.map(i => i.translate({str})))
+      const coincidence = (arr: Awaited<Json>[]) => [...new Set(translates.map(i => i.value))]
       const isNotCoincidence = coincidence(translates)
 
       // Проверить расхождение переводов если различаются,

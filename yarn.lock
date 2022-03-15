@@ -422,6 +422,11 @@ mute-stream@0.0.8:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
 
+object-path-set@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/object-path-set/-/object-path-set-1.0.2.tgz#364fbd844d3be47c61a074553af1bfd36c2b5d1e"
+  integrity sha512-kvjSaWTxrT4h66JIf4zR4LPxLCEBny0WIP/JIbQ6nqdI8qwfDcNV9vafjWqWBWL+tNlpLB9XyWCkxydCf/wuMw==
+
 once@^1.3.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/once/-/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"

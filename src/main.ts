@@ -4,9 +4,9 @@ import chalk from 'chalk'
 import fs from 'fs'
 import Writer from "./classes/Writer";
 import {Itranslitor} from "./interface/Itranslitor";
-import Google from "./classes/Google";
-import Yandex from "./classes/Yandex";
 import FileGenerator from "./utils/FileGenerator";
+import Microsoft from "./classes/translators/Microsoft";
+import {Json} from "./types/Json";
 
 const commander = program
 commander
@@ -17,23 +17,25 @@ commander
   .command('translate <from> <to>')
   .description('Создает новый файл с текстами для перевода.')
   .action(async (from, to) => {
-    console.log(from, to)
     const writer = new Writer({
       pathRead: './jsons/en.json'
     })
 
-
-    const translators: Itranslitor[] = [
-      new Google(from,to),
-      new Yandex(from, to)
-    ]
-
     const realFile = writer.readFile()
 
-    const file = await FileGenerator(realFile, translators)
+    const translators: Itranslitor[] = [
+      new Microsoft(from, to, realFile)
+    ]
 
-    //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
-    writer.writeFile('test', file)
+    const result: Json[] = await Promise.all(
+      translators.map(i => i.translate())
+    )
+
+    //
+    // const file = await FileGenerator(realFile, translators)
+    //
+    // //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
+    writer.writeFile('test', result[0])
 
   })
 
