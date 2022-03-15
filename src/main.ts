@@ -1,12 +1,10 @@
 import { program } from 'commander'
 import { prompt } from 'inquirer'
-import chalk from 'chalk'
-import fs from 'fs'
 import Writer from "./classes/Writer";
 import {Itranslitor} from "./interface/Itranslitor";
-import FileGenerator from "./utils/FileGenerator";
 import Microsoft from "./classes/translators/Microsoft";
 import {Json} from "./types/Json";
+import {COLOR_CONSOLE} from "./const/COLOR_CONSOLE";
 
 const commander = program
 commander
@@ -16,27 +14,42 @@ commander
 commander
   .command('translate <from> <to>')
   .description('Создает новый файл с текстами для перевода.')
-  .action(async (from, to) => {
-    const writer = new Writer({
-      pathRead: './jsons/en.json'
-    })
+  .option('--read <value>', 'На основании какого файла переводим')
+  .option('--patch-write <value>', 'папка в которую записываем')
+  .option('--filename <value>', 'имя файла при сохранении')
+  .action(async (from, to, options) => {
+    if (!options.read) {
+      console.log(`Файл для чтения не указан, попытка найти ./locales/${from}.json`)
+    }
 
+
+    const writer = new Writer({
+      pathRead: options.read || `./locales/${from}.json`,
+      pathWrite: options.patchWrite || './locales'
+    })
     const realFile = writer.readFile()
 
-    const translators: Itranslitor[] = [
-      new Microsoft(from, to, realFile)
-    ]
+    if (realFile) {
+      const translators: Itranslitor[] = [
+        new Microsoft(from, to, realFile)
+      ]
 
-    const result: Json[] = await Promise.all(
-      translators.map(i => i.translate())
-    )
+      // TODO сделать перевод и сравнение результатов с нескольких переводчиков
+      // TODO интерполяция не работает {{ name }} - на выходе получаем {{ имя }} ожидаем {{ name }}
+      const result: Json[] = await Promise.all(
+        translators.map(i => i.translate())
+      )
 
-    //
-    // const file = await FileGenerator(realFile, translators)
-    //
-    // //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
-    writer.writeFile('test', result[0])
-
+      //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
+      if (!options.patchWrite)
+        console.log('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
+      try {
+        writer.writeFile(options.filename || to, result[0])
+        console.log(COLOR_CONSOLE.FgGreen, 'Файл успешно записан')
+      } catch (e) {
+        console.log(COLOR_CONSOLE.FgRed, e)
+      }
+    }
   })
 
 

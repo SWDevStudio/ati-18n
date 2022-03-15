@@ -26,8 +26,13 @@ export default class Writer {
     fs.writeFileSync(`${this.pathWrite}/${fileName}.${extension}`, JSON.stringify(write))
   }
 
-  readFile(): Json {
-    return JSON.parse(fs.readFileSync(this.pathRead).toString())
+  readFile(): Json | null {
+    try {
+      return JSON.parse(fs.readFileSync(this.pathRead).toString())
+    } catch (e) {
+      console.log('Файл для чтения не найден!')
+      return null
+    }
   }
 
 }
