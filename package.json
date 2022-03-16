@@ -1,11 +1,12 @@
 {
   "name": "ati-18n",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "main.js",
   "author": "Kotaro",
   "license": "MIT",
   "preferGlobal": true,
   "bin": "./dist/main.js",
+  "homepage": "https://github.com/SWDevStudio/ati-18n",
   "scripts": {
     "start": "tsc && node dist/main.js translate en ru",
     "build": "tsc"
