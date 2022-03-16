@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { program } from 'commander'
 import { prompt } from 'inquirer'
 import Writer from "./classes/Writer";
