@@ -10,7 +10,7 @@ import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 
 const commander = program
 commander
-  .version('1.0.2')
+  .version('1.0.4')
   .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.')
 
 commander

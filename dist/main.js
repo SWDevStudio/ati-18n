@@ -21,7 +21,7 @@ const printColorText_1 = __importDefault(require("./utils/printColorText"));
 const DEFAULT_CONFIG_1 = require("./const/DEFAULT_CONFIG");
 const commander = commander_1.program;
 commander
-    .version('1.0.1')
+    .version('1.0.4')
     .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.');
 commander
     .command('translate')

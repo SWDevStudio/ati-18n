@@ -1,6 +1,6 @@
 {
   "name": "ati-18n",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "main": "main.js",
   "author": "Kotaro",
   "license": "MIT",
@@ -9,7 +9,8 @@
   "homepage": "https://github.com/SWDevStudio/ati-18n",
   "scripts": {
     "start": "tsc && node dist/main.js translate",
-    "build": "tsc"
+    "build": "tsc",
+    "deploy": "tsc && yarn publish"
   },
   "dependencies": {
     "@types/commander": "^2.12.2",
