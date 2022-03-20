@@ -30,15 +30,17 @@ export default class Writer {
     fs.writeFileSync(`${this.pathWrite}/${fileName}.${extension}`, JSON.stringify(write))
   }
 
-  readFile(pathRead?: string): Json | null {
+  readFile(pathRead?: string, softReading?: boolean): Json | null {
     try {
-      if (pathRead && !this.pathRead) {
+      if (!pathRead && !this.pathRead) {
         throw new Error('Укажите путь для чтения!')
       }
       return JSON.parse(fs.readFileSync(pathRead || this.pathRead || '').toString())
     } catch (e) {
-      printColorText('Файл для чтения не найден!', COLOR_CONSOLE.FgRed)
-      console.error(e)
+      if (!softReading) {
+        printColorText('Файл для чтения не найден!', COLOR_CONSOLE.FgRed)
+        console.error(e)
+      }
       return null
     }
   }

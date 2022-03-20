@@ -23,13 +23,13 @@ commander
   .option('--filename <value>', 'Имя файла при сохранении. По умолчанию выбранный язык.')
   .action(async (args) => {
 
-    const configFile = new Writer({
-      pathRead: './ati-18n.config.json'
-    })
-
-    const ctx = {
-      ...configFile.readFile(),
-      ...args
+    const configFile = new Writer().readFile('./ati-18n.config.json', true)
+    let ctx = args
+    if (configFile) {
+      ctx = {
+        ...configFile,
+        ...ctx
+      }
     }
 
     if (!ctx.read) {
@@ -38,6 +38,7 @@ commander
         return
       } else {
         console.log(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`)
+        return
       }
     }
 
