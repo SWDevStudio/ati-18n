@@ -25,16 +25,18 @@ class Writer {
         }
         fs_1.default.writeFileSync(`${this.pathWrite}/${fileName}.${extension}`, JSON.stringify(write));
     }
-    readFile(pathRead) {
+    readFile(pathRead, softReading) {
         try {
-            if (pathRead && !this.pathRead) {
+            if (!pathRead && !this.pathRead) {
                 throw new Error('Укажите путь для чтения!');
             }
             return JSON.parse(fs_1.default.readFileSync(pathRead || this.pathRead || '').toString());
         }
         catch (e) {
-            (0, printColorText_1.default)('Файл для чтения не найден!', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
-            console.error(e);
+            if (!softReading) {
+                (0, printColorText_1.default)('Файл для чтения не найден!', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+                console.error(e);
+            }
             return null;
         }
     }

@@ -21,7 +21,7 @@ const printColorText_1 = __importDefault(require("./utils/printColorText"));
 const DEFAULT_CONFIG_1 = require("./const/DEFAULT_CONFIG");
 const commander = commander_1.program;
 commander
-    .version('1.0.4')
+    .version('1.0.5')
     .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.');
 commander
     .command('translate')
@@ -32,10 +32,11 @@ commander
     .option('-w, --patch-write <value>', 'Путь к папке, в которую будет записан файл. Пример => ./locales')
     .option('--filename <value>', 'Имя файла при сохранении. По умолчанию выбранный язык.')
     .action((args) => __awaiter(void 0, void 0, void 0, function* () {
-    const configFile = new Writer_1.default({
-        pathRead: './ati-18n.config.json'
-    });
-    const ctx = Object.assign(Object.assign({}, configFile.readFile()), args);
+    const configFile = new Writer_1.default().readFile('./ati-18n.config.json', true);
+    let ctx = args;
+    if (configFile) {
+        ctx = Object.assign(Object.assign({}, configFile), ctx);
+    }
     if (!ctx.read) {
         if (!ctx.from) {
             console.log('Укажите файл для чтения! Пример => --read ./locales/*.json');
@@ -43,6 +44,7 @@ commander
         }
         else {
             console.log(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`);
+            return;
         }
     }
     //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
