@@ -6,6 +6,7 @@ import {Json} from "../../types/Json";
 import {Responses} from "../../interface/Responses";
 // @ts-ignore
 import setPath from 'object-path-set'
+import {replaceInterpolation} from "../../utils/intrapolation";
 type RequestMicrosoft = {
   text: string
   key: string
@@ -43,8 +44,14 @@ export default class Microsoft extends Translator implements Itranslitor {
 
     // Возможно у некоторых API есть сразу перевод объект, что позволит не писать прослойку => нужно проверить есть ли такое в Microsoft
     const response: AxiosResponse<Responses.Microsoft[]> = await this.axios.post('/translate', translateObject)
-    const needArr = response.data.map(i => i.translations).flat()
-    return this._toJson(translateObject, needArr)
+    const translateResponse = response.data.map(i => i.translations).flat()
+
+    // Если интерполяция будет переведена переводчиком
+    translateResponse.forEach((item, key) => {
+      translateResponse[key].text = replaceInterpolation(translateObject[key].text, item.text)
+    })
+
+    return this._toJson(translateObject, translateResponse)
   }
 
 
@@ -77,14 +84,4 @@ export default class Microsoft extends Translator implements Itranslitor {
     return obj
   }
 
-  // GetByPath(obj: any, path: any) {
-  //   let parts = path.split(".");
-  //   let current = obj;
-  //   for (let i = 0; i < parts.length; i++) {
-  //     current = current[parts[i]];
-  //     if (!current)
-  //       break;
-  //   }
-  //   return current;
-  // }
 }
