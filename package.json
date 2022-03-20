@@ -8,7 +8,7 @@
   "bin": "./dist/main.js",
   "homepage": "https://github.com/SWDevStudio/ati-18n",
   "scripts": {
-    "start": "tsc && node dist/main.js translate en ru",
+    "start": "tsc && node dist/main.js translate",
     "build": "tsc"
   },
   "dependencies": {

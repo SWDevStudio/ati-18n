@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { program } from 'commander'
-import { prompt } from 'inquirer'
+import {program} from 'commander'
 import Writer from "./classes/Writer";
 import {Itranslitor} from "./interface/Itranslitor";
 import Microsoft from "./classes/translators/Microsoft";
 import {Json} from "./types/Json";
 import {COLOR_CONSOLE} from "./const/COLOR_CONSOLE";
+import printColorText from "./utils/printColorText";
+import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 
 const commander = program
 commander
@@ -13,26 +14,47 @@ commander
   .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.')
 
 commander
-  .command('translate <from> <to>')
+  .command('translate')
   .description('Создает новый файл с текстами для перевода.')
-  .option('--read <value>', 'Путь к файлу который нужно перевести. Пример => ./locales/en.json')
-  .option('--patch-write <value>', 'Путь к папке, в которую будет записан файл. Пример => ./locales')
-  .option('--filename <value>', 'имя файла при сохранении. По умолчанию выбранный язык.')
-  .action(async (from, to, options) => {
-    if (!options.read) {
-      console.log(`Файл для чтения не указан, попытка найти ./locales/${from}.json`)
+  .option('--from <value>', 'С какого языка переводится')
+  .option('--to <value>', 'На какой язык нужен перевод')
+  .option('-r, --read <value>', 'Путь к файлу который нужно перевести. Пример => ./locales/en.json')
+  .option('-w, --patch-write <value>', 'Путь к папке, в которую будет записан файл. Пример => ./locales')
+  .option('--filename <value>', 'Имя файла при сохранении. По умолчанию выбранный язык.')
+  .action(async (args) => {
+
+    const configFile = new Writer({
+      pathRead: './ati-18n.config.json'
+    })
+
+    const ctx = {
+      ...configFile.readFile(),
+      ...args
     }
 
+    if (!ctx.read) {
+      if (!ctx.from) {
+        console.log('Укажите файл для чтения! Пример => --read ./locales/*.json')
+        return
+      } else {
+        console.log(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`)
+      }
+    }
+
+    //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
+    if (!ctx.patchWrite)
+      console.log('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
 
     const writer = new Writer({
-      pathRead: options.read || `./locales/${from}.json`,
-      pathWrite: options.patchWrite || './locales'
+      pathRead: ctx.read || `./locales/${ctx.from}.json`,
+      pathWrite: ctx.patchWrite || './locales'
     })
+
     const realFile = writer.readFile()
 
     if (realFile) {
       const translators: Itranslitor[] = [
-        new Microsoft(from, to, realFile)
+        new Microsoft(ctx.from, ctx.to, realFile)
       ]
 
       // TODO сделать перевод и сравнение результатов с нескольких переводчиков
@@ -40,15 +62,31 @@ commander
         translators.map(i => i.translate())
       )
 
-      //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
-      if (!options.patchWrite)
-        console.log('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
+
       try {
-        writer.writeFile(options.filename || to, result[0])
-        console.log(COLOR_CONSOLE.FgGreen, 'Файл успешно записан')
+        writer.writeFile(ctx.filename || ctx.to, result[0])
+        printColorText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
       } catch (e) {
-        console.log(COLOR_CONSOLE.FgRed, e)
+        printColorText(e, COLOR_CONSOLE.FgRed)
       }
+    }
+  })
+
+
+commander
+  .command('generate-config')
+  .description('Создает дефолтный конфигурационный файл для программы')
+  .action(() => {
+    const writer = new Writer({
+      pathWrite: './',
+    })
+
+    try {
+      writer.writeFile('ati-18n.config', DEFAULT_CONFIG)
+      printColorText('Создан базовый конфигурационный файл', COLOR_CONSOLE.FgGreen)
+    } catch (e) {
+      printColorText('Не удалось, создать конфигурационный файл', COLOR_CONSOLE.FgRed)
+      console.error(e)
     }
   })
 

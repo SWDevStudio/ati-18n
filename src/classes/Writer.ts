@@ -2,10 +2,12 @@ import {WRITER_OPTIONS} from "../const/WRITER_OPTIONS";
 import {Json} from "../types/Json";
 import fs from 'fs';
 import path from 'path'
+import printColorText from "../utils/printColorText";
+import {COLOR_CONSOLE} from "../const/COLOR_CONSOLE";
 
 export default class Writer {
   readonly pathWrite: string
-  readonly pathRead: string
+  readonly pathRead?: string
 
   constructor(options =  WRITER_OPTIONS) {
     // Смержим с дефолтными настройками, работает только если нет вложенности в опциях!
@@ -14,8 +16,10 @@ export default class Writer {
     if (!options.pathWrite) throw new Error('Set pathWrite in options!')
     this.pathWrite = path.normalize(options.pathWrite)
 
-    if (!options.pathRead) throw new Error('Set pathRead in options!')
-    this.pathRead = path.normalize(options.pathRead)
+    if (options.pathRead) {
+      this.pathRead = path.normalize(options.pathRead)
+    }
+
   }
 
   writeFile(fileName: string, write: Json, extension = 'json'): void {
@@ -26,11 +30,15 @@ export default class Writer {
     fs.writeFileSync(`${this.pathWrite}/${fileName}.${extension}`, JSON.stringify(write))
   }
 
-  readFile(): Json | null {
+  readFile(pathRead?: string): Json | null {
     try {
-      return JSON.parse(fs.readFileSync(this.pathRead).toString())
+      if (pathRead && !this.pathRead) {
+        throw new Error('Укажите путь для чтения!')
+      }
+      return JSON.parse(fs.readFileSync(pathRead || this.pathRead || '').toString())
     } catch (e) {
-      console.log('Файл для чтения не найден!')
+      printColorText('Файл для чтения не найден!', COLOR_CONSOLE.FgRed)
+      console.error(e)
       return null
     }
   }
