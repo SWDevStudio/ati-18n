@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const WRITER_OPTIONS_1 = require("../const/WRITER_OPTIONS");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const printColorText_1 = __importDefault(require("../utils/printColorText"));
+const COLOR_CONSOLE_1 = require("../const/COLOR_CONSOLE");
 class Writer {
     constructor(options = WRITER_OPTIONS_1.WRITER_OPTIONS) {
         // Смержим с дефолтными настройками, работает только если нет вложенности в опциях!
@@ -13,9 +15,9 @@ class Writer {
         if (!options.pathWrite)
             throw new Error('Set pathWrite in options!');
         this.pathWrite = path_1.default.normalize(options.pathWrite);
-        if (!options.pathRead)
-            throw new Error('Set pathRead in options!');
-        this.pathRead = path_1.default.normalize(options.pathRead);
+        if (options.pathRead) {
+            this.pathRead = path_1.default.normalize(options.pathRead);
+        }
     }
     writeFile(fileName, write, extension = 'json') {
         if (!fs_1.default.existsSync(this.pathWrite)) {
@@ -23,12 +25,16 @@ class Writer {
         }
         fs_1.default.writeFileSync(`${this.pathWrite}/${fileName}.${extension}`, JSON.stringify(write));
     }
-    readFile() {
+    readFile(pathRead) {
         try {
-            return JSON.parse(fs_1.default.readFileSync(this.pathRead).toString());
+            if (pathRead && !this.pathRead) {
+                throw new Error('Укажите путь для чтения!');
+            }
+            return JSON.parse(fs_1.default.readFileSync(pathRead || this.pathRead || '').toString());
         }
         catch (e) {
-            console.log('Файл для чтения не найден!');
+            (0, printColorText_1.default)('Файл для чтения не найден!', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+            console.error(e);
             return null;
         }
     }
