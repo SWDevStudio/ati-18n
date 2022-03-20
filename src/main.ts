@@ -9,15 +9,15 @@ import {COLOR_CONSOLE} from "./const/COLOR_CONSOLE";
 
 const commander = program
 commander
-  .version('1.0.0')
-  .description('Котики захватят мир')
+  .version('1.0.1')
+  .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.')
 
 commander
   .command('translate <from> <to>')
   .description('Создает новый файл с текстами для перевода.')
-  .option('--read <value>', 'На основании какого файла переводим')
-  .option('--patch-write <value>', 'папка в которую записываем')
-  .option('--filename <value>', 'имя файла при сохранении')
+  .option('--read <value>', 'Путь к файлу который нужно перевести. Пример => ./locales/en.json')
+  .option('--patch-write <value>', 'Путь к папке, в которую будет записан файл. Пример => ./locales')
+  .option('--filename <value>', 'имя файла при сохранении. По умолчанию выбранный язык.')
   .action(async (from, to, options) => {
     if (!options.read) {
       console.log(`Файл для чтения не указан, попытка найти ./locales/${from}.json`)
@@ -36,7 +36,6 @@ commander
       ]
 
       // TODO сделать перевод и сравнение результатов с нескольких переводчиков
-      // TODO интерполяция не работает {{ name }} - на выходе получаем {{ имя }} ожидаем {{ name }}
       const result: Json[] = await Promise.all(
         translators.map(i => i.translate())
       )
