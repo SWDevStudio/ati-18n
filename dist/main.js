@@ -17,11 +17,11 @@ const commander_1 = require("commander");
 const Writer_1 = __importDefault(require("./classes/Writer"));
 const Microsoft_1 = __importDefault(require("./classes/translators/Microsoft"));
 const COLOR_CONSOLE_1 = require("./const/COLOR_CONSOLE");
-const printColorText_1 = __importDefault(require("./utils/printColorText"));
+const printText_1 = __importDefault(require("./utils/printText"));
 const DEFAULT_CONFIG_1 = require("./const/DEFAULT_CONFIG");
 const commander = commander_1.program;
 commander
-    .version('1.0.5')
+    .version('1.1.0')
     .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.');
 commander
     .command('translate')
@@ -37,37 +37,45 @@ commander
     if (configFile) {
         ctx = Object.assign(Object.assign({}, configFile), ctx);
     }
-    if (!ctx.read) {
-        if (!ctx.from) {
-            console.log('Укажите файл для чтения! Пример => --read ./locales/*.json');
-            return;
+    const startTranslate = (lang) => __awaiter(void 0, void 0, void 0, function* () {
+        if (!ctx.read) {
+            if (!ctx.from) {
+                (0, printText_1.default)('Укажите файл для чтения! Пример => --read ./locales/*.json');
+                return;
+            }
+            else {
+                (0, printText_1.default)(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`);
+                return;
+            }
         }
-        else {
-            console.log(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`);
-            return;
+        //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
+        if (!ctx.patchWrite)
+            (0, printText_1.default)('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales');
+        const writer = new Writer_1.default({
+            pathRead: ctx.read || `./locales/${ctx.from}.json`,
+            pathWrite: ctx.patchWrite || './locales'
+        });
+        const realFile = writer.readFile();
+        if (realFile) {
+            const translators = [
+                new Microsoft_1.default(ctx.from, lang, realFile)
+            ];
+            // TODO сделать перевод и сравнение результатов с нескольких переводчиков
+            const result = yield Promise.all(translators.map(i => i.translate()));
+            try {
+                writer.writeFile(lang, result[0]);
+                (0, printText_1.default)('Файл успешно записан', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
+            }
+            catch (e) {
+                (0, printText_1.default)(e, COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+            }
         }
-    }
-    //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
-    if (!ctx.patchWrite)
-        console.log('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales');
-    const writer = new Writer_1.default({
-        pathRead: ctx.read || `./locales/${ctx.from}.json`,
-        pathWrite: ctx.patchWrite || './locales'
     });
-    const realFile = writer.readFile();
-    if (realFile) {
-        const translators = [
-            new Microsoft_1.default(ctx.from, ctx.to, realFile)
-        ];
-        // TODO сделать перевод и сравнение результатов с нескольких переводчиков
-        const result = yield Promise.all(translators.map(i => i.translate()));
-        try {
-            writer.writeFile(ctx.filename || ctx.to, result[0]);
-            (0, printColorText_1.default)('Файл успешно записан', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
-        }
-        catch (e) {
-            (0, printColorText_1.default)(e, COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
-        }
+    if (Array.isArray(ctx.to)) {
+        ctx.to.forEach((i) => startTranslate(i));
+    }
+    else {
+        startTranslate(ctx.to);
     }
 }));
 commander
@@ -79,11 +87,11 @@ commander
     });
     try {
         writer.writeFile('ati-18n.config', DEFAULT_CONFIG_1.DEFAULT_CONFIG);
-        (0, printColorText_1.default)('Создан базовый конфигурационный файл', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
+        (0, printText_1.default)('Создан базовый конфигурационный файл', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
     }
     catch (e) {
-        (0, printColorText_1.default)('Не удалось, создать конфигурационный файл', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
-        console.error(e);
+        (0, printText_1.default)('Не удалось, создать конфигурационный файл', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+        (0, printText_1.default)(e);
     }
 });
 commander.parse(process.argv);

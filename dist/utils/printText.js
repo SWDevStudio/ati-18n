@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function printColorText(str, color) {
+function printText(str, color) {
     if (color) {
         console.log(color);
     }
@@ -10,4 +10,4 @@ function printColorText(str, color) {
         console.log('\x1b[0m');
     }
 }
-exports.default = printColorText;
+exports.default = printText;

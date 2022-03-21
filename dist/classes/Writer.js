@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const WRITER_OPTIONS_1 = require("../const/WRITER_OPTIONS");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const printColorText_1 = __importDefault(require("../utils/printColorText"));
+const printText_1 = __importDefault(require("../utils/printText"));
 const COLOR_CONSOLE_1 = require("../const/COLOR_CONSOLE");
 class Writer {
     constructor(options = WRITER_OPTIONS_1.WRITER_OPTIONS) {
@@ -34,8 +34,8 @@ class Writer {
         }
         catch (e) {
             if (!softReading) {
-                (0, printColorText_1.default)('Файл для чтения не найден!', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
-                console.error(e);
+                (0, printText_1.default)('Файл для чтения не найден!', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+                (0, printText_1.default)(e);
             }
             return null;
         }
