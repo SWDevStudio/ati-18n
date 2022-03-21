@@ -5,7 +5,7 @@ import {Itranslitor} from "./interface/Itranslitor";
 import Microsoft from "./classes/translators/Microsoft";
 import {Json} from "./types/Json";
 import {COLOR_CONSOLE} from "./const/COLOR_CONSOLE";
-import printColorText from "./utils/printColorText";
+import printText from "./utils/printText";
 import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 
 const commander = program
@@ -35,17 +35,17 @@ commander
     const startTranslate = async (lang: string) => {
       if (!ctx.read) {
         if (!ctx.from) {
-          console.log('Укажите файл для чтения! Пример => --read ./locales/*.json')
+          printText('Укажите файл для чтения! Пример => --read ./locales/*.json')
           return
         } else {
-          console.log(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`)
+          printText(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`)
           return
         }
       }
 
       //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
       if (!ctx.patchWrite)
-        console.log('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
+        printText('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
 
       const writer = new Writer({
         pathRead: ctx.read || `./locales/${ctx.from}.json`,
@@ -67,9 +67,9 @@ commander
 
         try {
           writer.writeFile(lang, result[0])
-          printColorText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
+          printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
         } catch (e) {
-          printColorText(e, COLOR_CONSOLE.FgRed)
+          printText(e, COLOR_CONSOLE.FgRed)
         }
       }
     }
@@ -93,10 +93,10 @@ commander
 
     try {
       writer.writeFile('ati-18n.config', DEFAULT_CONFIG)
-      printColorText('Создан базовый конфигурационный файл', COLOR_CONSOLE.FgGreen)
+      printText('Создан базовый конфигурационный файл', COLOR_CONSOLE.FgGreen)
     } catch (e) {
-      printColorText('Не удалось, создать конфигурационный файл', COLOR_CONSOLE.FgRed)
-      console.error(e)
+      printText('Не удалось, создать конфигурационный файл', COLOR_CONSOLE.FgRed)
+      printText(e)
     }
   })
 

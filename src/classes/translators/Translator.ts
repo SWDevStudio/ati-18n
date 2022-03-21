@@ -1,6 +1,6 @@
 import {Json} from "../../types/Json";
 import {COLOR_CONSOLE} from "../../const/COLOR_CONSOLE";
-import printColorText from "../../utils/printColorText";
+import printText from "../../utils/printText";
 
 export default class Translator {
   langTo: string
@@ -9,7 +9,7 @@ export default class Translator {
 
   constructor(langFrom: string, langTo: string, target: Json) {
     if (!langFrom) {
-      printColorText('Исходный язык будет определен автоматически! Пример => translate -f ru', COLOR_CONSOLE.FgYellow)
+      printText('Исходный язык будет определен автоматически! Пример => translate -f ru', COLOR_CONSOLE.FgYellow)
     }
     this.targetJson = target
     this.langFrom = langFrom

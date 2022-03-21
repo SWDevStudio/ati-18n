@@ -2,7 +2,7 @@ import {WRITER_OPTIONS} from "../const/WRITER_OPTIONS";
 import {Json} from "../types/Json";
 import fs from 'fs';
 import path from 'path'
-import printColorText from "../utils/printColorText";
+import printText from "../utils/printText";
 import {COLOR_CONSOLE} from "../const/COLOR_CONSOLE";
 
 export default class Writer {
@@ -38,8 +38,8 @@ export default class Writer {
       return JSON.parse(fs.readFileSync(pathRead || this.pathRead || '').toString())
     } catch (e) {
       if (!softReading) {
-        printColorText('Файл для чтения не найден!', COLOR_CONSOLE.FgRed)
-        console.error(e)
+        printText('Файл для чтения не найден!', COLOR_CONSOLE.FgRed)
+        printText(e)
       }
       return null
     }

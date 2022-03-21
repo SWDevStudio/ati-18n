@@ -1,6 +1,6 @@
 import {COLOR_CONSOLE} from "../const/COLOR_CONSOLE";
 
-export default function printColorText(str: any, color?: COLOR_CONSOLE) {
+export default function printText(str: any, color?: COLOR_CONSOLE) {
   if (color) {
     console.log(color)
   }
