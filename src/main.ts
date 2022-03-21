@@ -43,7 +43,6 @@ commander
         }
       }
 
-      //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
       if (!ctx.patchWrite)
         printText('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
 
@@ -88,13 +87,13 @@ commander
 commander
   .command('generate-config')
   .description('Создает дефолтный конфигурационный файл для программы')
-  .action(() => {
+  .action(async () => {
     const writer = new Writer({
       pathWrite: './',
     })
 
     try {
-      writer.writeFile('ati-18n.config', DEFAULT_CONFIG)
+      await writer.writeFile('ati-18n.config', DEFAULT_CONFIG)
       printText('Создан базовый конфигурационный файл', COLOR_CONSOLE.FgGreen)
     } catch (e) {
       printText('Не удалось, создать конфигурационный файл', COLOR_CONSOLE.FgRed)
