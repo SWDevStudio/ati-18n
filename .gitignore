@@ -1,2 +1,4 @@
 node_modules
 .idea
+locales
+ati-18n.config.json
