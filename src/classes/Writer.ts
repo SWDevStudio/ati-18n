@@ -4,6 +4,8 @@ import fs from 'fs';
 import path from 'path'
 import printText from "../utils/printText";
 import {COLOR_CONSOLE} from "../const/COLOR_CONSOLE";
+import inquirer from "inquirer";
+import generateHash from "../utils/generateHash";
 
 export default class Writer {
   readonly pathWrite: string
@@ -22,9 +24,24 @@ export default class Writer {
 
   }
 
-  writeFile(fileName: string, write: Json, extension = 'json'): void {
+  async writeFile(fileName: string, write: Json, extension = 'json'): Promise<void> {
     if (!fs.existsSync(this.pathWrite)) {
       fs.mkdirSync(this.pathWrite);
+    }
+
+    const existFile = fs.existsSync(`${this.pathWrite}/${fileName}.${extension}`)
+    if (existFile) {
+
+      const { rewrite } = await inquirer.prompt([
+        { type: 'list', name: 'rewrite', message: `Файл ${fileName}.${extension} уже существует, перезаписать?`, choices: ['yes', 'no'] }
+      ])
+
+      if (rewrite === 'no') {
+        const hash = generateHash(6)
+        fs.writeFileSync(`${this.pathWrite}/${fileName}.${hash}.${extension}`, JSON.stringify(write))
+        printText(`Файл создан под именем ${fileName}.${hash}.${extension}`, COLOR_CONSOLE.FgGreen)
+        return
+      }
     }
 
     fs.writeFileSync(`${this.pathWrite}/${fileName}.${extension}`, JSON.stringify(write))

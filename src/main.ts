@@ -66,7 +66,7 @@ commander
 
 
         try {
-          writer.writeFile(lang, result[0])
+          await writer.writeFile(lang, result[0])
           printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
         } catch (e) {
           printText(e, COLOR_CONSOLE.FgRed)
@@ -76,9 +76,11 @@ commander
 
 
     if (Array.isArray(ctx.to)) {
-      ctx.to.forEach((i: string) => startTranslate(i))
+      for (let i of ctx.to) {
+        await startTranslate(i)
+      }
     } else {
-      startTranslate(ctx.to)
+      await startTranslate(ctx.to)
     }
   })
 
