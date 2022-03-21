@@ -32,44 +32,53 @@ commander
       }
     }
 
-    if (!ctx.read) {
-      if (!ctx.from) {
-        console.log('Укажите файл для чтения! Пример => --read ./locales/*.json')
-        return
-      } else {
-        console.log(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`)
-        return
+    const startTranslate = async (lang: string) => {
+      if (!ctx.read) {
+        if (!ctx.from) {
+          console.log('Укажите файл для чтения! Пример => --read ./locales/*.json')
+          return
+        } else {
+          console.log(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`)
+          return
+        }
+      }
+
+      //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
+      if (!ctx.patchWrite)
+        console.log('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
+
+      const writer = new Writer({
+        pathRead: ctx.read || `./locales/${ctx.from}.json`,
+        pathWrite: ctx.patchWrite || './locales'
+      })
+
+      const realFile = writer.readFile()
+
+      if (realFile) {
+        const translators: Itranslitor[] = [
+          new Microsoft(ctx.from, lang, realFile)
+        ]
+
+        // TODO сделать перевод и сравнение результатов с нескольких переводчиков
+        const result: Json[] = await Promise.all(
+          translators.map(i => i.translate())
+        )
+
+
+        try {
+          writer.writeFile(lang, result[0])
+          printColorText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
+        } catch (e) {
+          printColorText(e, COLOR_CONSOLE.FgRed)
+        }
       }
     }
 
-    //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
-    if (!ctx.patchWrite)
-      console.log('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
 
-    const writer = new Writer({
-      pathRead: ctx.read || `./locales/${ctx.from}.json`,
-      pathWrite: ctx.patchWrite || './locales'
-    })
-
-    const realFile = writer.readFile()
-
-    if (realFile) {
-      const translators: Itranslitor[] = [
-        new Microsoft(ctx.from, ctx.to, realFile)
-      ]
-
-      // TODO сделать перевод и сравнение результатов с нескольких переводчиков
-      const result: Json[] = await Promise.all(
-        translators.map(i => i.translate())
-      )
-
-
-      try {
-        writer.writeFile(ctx.filename || ctx.to, result[0])
-        printColorText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
-      } catch (e) {
-        printColorText(e, COLOR_CONSOLE.FgRed)
-      }
+    if (Array.isArray(ctx.to)) {
+      ctx.to.forEach((i: string) => startTranslate(i))
+    } else {
+      startTranslate(ctx.to)
     }
   })
 
