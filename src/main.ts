@@ -11,7 +11,7 @@ import {prompt} from "inquirer";
 
 const commander = program
 commander
-  .version('1.1.0')
+  .version('1.1.1')
   .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.')
 
 commander

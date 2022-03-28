@@ -19,6 +19,7 @@ const Microsoft_1 = __importDefault(require("./classes/translators/Microsoft"));
 const COLOR_CONSOLE_1 = require("./const/COLOR_CONSOLE");
 const printText_1 = __importDefault(require("./utils/printText"));
 const DEFAULT_CONFIG_1 = require("./const/DEFAULT_CONFIG");
+const inquirer_1 = require("inquirer");
 const commander = commander_1.program;
 commander
     .version('1.1.0')
@@ -48,7 +49,6 @@ commander
                 return;
             }
         }
-        //TODO сделать мягкую перезапись если файл существует или же записывать рядом.
         if (!ctx.patchWrite)
             (0, printText_1.default)('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales');
         const writer = new Writer_1.default({
@@ -61,37 +61,56 @@ commander
                 new Microsoft_1.default(ctx.from, lang, realFile)
             ];
             // TODO сделать перевод и сравнение результатов с нескольких переводчиков
-            const result = yield Promise.all(translators.map(i => i.translate()));
-            try {
-                writer.writeFile(lang, result[0]);
-                (0, printText_1.default)('Файл успешно записан', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
+            const result = [];
+            for (let translator of translators) {
+                try {
+                    result.push(yield translator.translate());
+                }
+                catch (e) {
+                    (0, printText_1.default)(`Что то пошло не так в ${translator.name} при переводе на ${lang}`, COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+                    const { response } = yield (0, inquirer_1.prompt)({
+                        type: 'list', name: 'response', message: `Желаете узнать подробности?`, choices: ['yes', 'no']
+                    });
+                    if (response === 'yes') {
+                        console.log(e);
+                    }
+                    //TODO добавить возможность записывать логи программы в отдельный файл, что бы их можно было посмотреть.
+                }
             }
-            catch (e) {
-                (0, printText_1.default)(e, COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+            if (result[0]) {
+                try {
+                    yield writer.writeFile(lang, result[0]);
+                    (0, printText_1.default)('Файл успешно записан', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
+                }
+                catch (e) {
+                    (0, printText_1.default)(e, COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+                }
             }
         }
     });
     if (Array.isArray(ctx.to)) {
-        ctx.to.forEach((i) => startTranslate(i));
+        for (let i of ctx.to) {
+            yield startTranslate(i);
+        }
     }
     else {
-        startTranslate(ctx.to);
+        yield startTranslate(ctx.to);
     }
 }));
 commander
     .command('generate-config')
     .description('Создает дефолтный конфигурационный файл для программы')
-    .action(() => {
+    .action(() => __awaiter(void 0, void 0, void 0, function* () {
     const writer = new Writer_1.default({
         pathWrite: './',
     });
     try {
-        writer.writeFile('ati-18n.config', DEFAULT_CONFIG_1.DEFAULT_CONFIG);
+        yield writer.writeFile('ati-18n.config', DEFAULT_CONFIG_1.DEFAULT_CONFIG);
         (0, printText_1.default)('Создан базовый конфигурационный файл', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
     }
     catch (e) {
         (0, printText_1.default)('Не удалось, создать конфигурационный файл', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
         (0, printText_1.default)(e);
     }
-});
+}));
 commander.parse(process.argv);

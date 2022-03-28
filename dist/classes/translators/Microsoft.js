@@ -19,6 +19,7 @@ const object_path_set_1 = __importDefault(require("object-path-set"));
 const intrapolation_1 = require("../../utils/intrapolation");
 class Microsoft extends Translator_1.default {
     constructor(langFrom, langTo, targetJson) {
+        var _a, _b;
         super(langFrom, langTo, targetJson);
         this.name = 'Microsoft';
         this.axios = axios_1.default.create({
@@ -26,7 +27,7 @@ class Microsoft extends Translator_1.default {
             headers: {
                 'content-type': 'application/json',
                 'x-rapidapi-host': 'microsoft-translator-text.p.rapidapi.com',
-                'x-rapidapi-key': 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
+                'x-rapidapi-key': ((_b = (_a = this.configFile) === null || _a === void 0 ? void 0 : _a.translatorKeys) === null || _b === void 0 ? void 0 : _b.microsoft) || 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
             },
             params: {
                 'api-version': '3.0',
