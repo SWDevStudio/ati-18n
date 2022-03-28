@@ -57,7 +57,10 @@ ati-18n generate-config
   "from": "en",
   "to": "ru",
   "read": "./locales/en.json",
-  "patchWrite": "./locales"
+  "patchWrite": "./locales",
+  "translatorKeys": {
+    "microsoft": "fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817"
+  }
 }
 ```
 В to можно так же указать массив, тогда программа сделает перевод на все языки сразу.  
@@ -66,3 +69,10 @@ ati-18n generate-config
   "to": ["ru", "de"]
 }
 ```
+
+translatorKeys - вы можете добавить собственные ключи авторизации для переводчиков.
+<br>
+По умолчанию, делать этого не нужно.
+<br>
+Все переводчики в данном пакете используют этот [сервис](https://rapidapi.com/).
+Там вам нужен будет ключ X-RapidApi-key ([страница переводчика microsoft](https://rapidapi.com/microsoft-azure-org-microsoft-cognitive-services/api/microsoft-translator-text/)).

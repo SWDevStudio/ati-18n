@@ -23,7 +23,7 @@ export default class Microsoft extends Translator implements Itranslitor {
       headers: {
         'content-type': 'application/json',
         'x-rapidapi-host': 'microsoft-translator-text.p.rapidapi.com',
-        'x-rapidapi-key': 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
+        'x-rapidapi-key': this.configFile?.translatorKeys?.microsoft || 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
       },
       params: {
         'api-version': '3.0',
