@@ -7,6 +7,7 @@ import {Json} from "./types/Json";
 import {COLOR_CONSOLE} from "./const/COLOR_CONSOLE";
 import printText from "./utils/printText";
 import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
+import {prompt} from "inquirer";
 
 const commander = program
 commander
@@ -59,16 +60,32 @@ commander
         ]
 
         // TODO сделать перевод и сравнение результатов с нескольких переводчиков
-        const result: Json[] = await Promise.all(
-          translators.map(i => i.translate())
-        )
 
+        const result: Json[] = []
 
-        try {
-          await writer.writeFile(lang, result[0])
-          printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
-        } catch (e) {
-          printText(e, COLOR_CONSOLE.FgRed)
+        for (let translator of translators) {
+          try {
+            result.push(await translator.translate())
+          } catch (e: any) {
+            printText(`Что то пошло не так в ${translator.name} при переводе на ${lang}`, COLOR_CONSOLE.FgRed)
+
+            const {response} = await prompt<{response: 'yes' | 'no'}>({
+              type: 'list', name: 'response', message: `Желаете узнать подробности?`, choices: ['yes', 'no']
+            })
+            if (response === 'yes') {
+              console.log(e)
+            }
+            //TODO добавить возможность записывать логи программы в отдельный файл, что бы их можно было посмотреть.
+          }
+        }
+
+        if (result[0]) {
+          try {
+            await writer.writeFile(lang, result[0])
+            printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
+          } catch (e) {
+            printText(e, COLOR_CONSOLE.FgRed)
+          }
         }
       }
     }
