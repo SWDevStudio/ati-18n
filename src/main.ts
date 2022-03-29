@@ -8,6 +8,7 @@ import {COLOR_CONSOLE} from "./const/COLOR_CONSOLE";
 import printText from "./utils/printText";
 import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 import {prompt} from "inquirer";
+import Google from "./classes/translators/Google";
 
 const commander = program
 commander
@@ -56,7 +57,8 @@ commander
 
       if (realFile) {
         const translators: Itranslitor[] = [
-          new Microsoft(ctx.from, lang, realFile)
+          // new Microsoft(ctx.from, lang, realFile),
+          new Google(ctx.from, lang, realFile)
         ]
 
         // TODO сделать перевод и сравнение результатов с нескольких переводчиков

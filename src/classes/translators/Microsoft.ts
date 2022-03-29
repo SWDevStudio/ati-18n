@@ -7,7 +7,7 @@ import {Responses} from "../../interface/Responses";
 // @ts-ignore
 import setPath from 'object-path-set'
 import {replaceInterpolation} from "../../utils/intrapolation";
-type RequestMicrosoft = {
+export type RequestMicrosoft = {
   text: string
   key: string
 }
@@ -41,7 +41,6 @@ export default class Microsoft extends Translator implements Itranslitor {
     // После чего нужно получить ответ и собрать объект заново.
     // Далее возвращаем объект в едином виде для всего.
     const translateObject: RequestMicrosoft[] = this._dataGenerator()
-
     // Возможно у некоторых API есть сразу перевод объект, что позволит не писать прослойку => нужно проверить есть ли такое в Microsoft
     const response: AxiosResponse<Responses.Microsoft[]> = await this.axios.post('/translate', translateObject)
     const translateResponse = response.data.map(i => i.translations).flat()
