@@ -9,6 +9,7 @@ import printText from "./utils/printText";
 import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 import {prompt} from "inquirer";
 import Google from "./classes/translators/Google";
+import {mergeObjects} from "./utils/mergeObjects";
 
 const commander = program
 commander
@@ -57,7 +58,7 @@ commander
 
       if (realFile) {
         const translators: Itranslitor[] = [
-          // new Microsoft(ctx.from, lang, realFile),
+          new Microsoft(ctx.from, lang, realFile),
           new Google(ctx.from, lang, realFile)
         ]
 
@@ -79,6 +80,11 @@ commander
             }
             //TODO добавить возможность записывать логи программы в отдельный файл, что бы их можно было посмотреть.
           }
+        }
+
+        if (result.length >= 2) {
+          mergeObjects(result)
+          return
         }
 
         if (result[0]) {
