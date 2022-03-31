@@ -20,9 +20,11 @@ const COLOR_CONSOLE_1 = require("./const/COLOR_CONSOLE");
 const printText_1 = __importDefault(require("./utils/printText"));
 const DEFAULT_CONFIG_1 = require("./const/DEFAULT_CONFIG");
 const inquirer_1 = require("inquirer");
+const Google_1 = __importDefault(require("./classes/translators/Google"));
+const mergeObjects_1 = require("./utils/mergeObjects");
 const commander = commander_1.program;
 commander
-    .version('1.1.0')
+    .version('1.1.1')
     .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.');
 commander
     .command('translate')
@@ -58,7 +60,8 @@ commander
         const realFile = writer.readFile();
         if (realFile) {
             const translators = [
-                new Microsoft_1.default(ctx.from, lang, realFile)
+                new Microsoft_1.default(ctx.from, lang, realFile),
+                new Google_1.default(ctx.from, lang, realFile)
             ];
             // TODO сделать перевод и сравнение результатов с нескольких переводчиков
             const result = [];
@@ -77,14 +80,12 @@ commander
                     //TODO добавить возможность записывать логи программы в отдельный файл, что бы их можно было посмотреть.
                 }
             }
-            if (result[0]) {
-                try {
-                    yield writer.writeFile(lang, result[0]);
-                    (0, printText_1.default)('Файл успешно записан', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
-                }
-                catch (e) {
-                    (0, printText_1.default)(e, COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
-                }
+            try {
+                yield writer.writeFile(lang, result.length >= 2 ? yield (0, mergeObjects_1.mergeObjects)(result, realFile) : result[0]);
+                (0, printText_1.default)('Файл успешно записан', COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
+            }
+            catch (e) {
+                (0, printText_1.default)(e, COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
             }
         }
     });

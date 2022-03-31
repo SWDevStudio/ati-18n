@@ -13,7 +13,7 @@ import {mergeObjects} from "./utils/mergeObjects";
 
 const commander = program
 commander
-  .version('1.1.1')
+  .version('1.2.0')
   .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.')
 
 commander
