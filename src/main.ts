@@ -82,18 +82,11 @@ commander
           }
         }
 
-        if (result.length >= 2) {
-          mergeObjects(result)
-          return
-        }
-
-        if (result[0]) {
-          try {
-            await writer.writeFile(lang, result[0])
-            printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
-          } catch (e) {
-            printText(e, COLOR_CONSOLE.FgRed)
-          }
+        try {
+          await writer.writeFile(lang, result.length >= 2 ? await mergeObjects(result, realFile) : result[0])
+          printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
+        } catch (e) {
+          printText(e, COLOR_CONSOLE.FgRed)
         }
       }
     }
