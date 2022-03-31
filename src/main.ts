@@ -8,6 +8,8 @@ import {COLOR_CONSOLE} from "./const/COLOR_CONSOLE";
 import printText from "./utils/printText";
 import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 import {prompt} from "inquirer";
+import Google from "./classes/translators/Google";
+import {mergeObjects} from "./utils/mergeObjects";
 
 const commander = program
 commander
@@ -56,7 +58,8 @@ commander
 
       if (realFile) {
         const translators: Itranslitor[] = [
-          new Microsoft(ctx.from, lang, realFile)
+          new Microsoft(ctx.from, lang, realFile),
+          new Google(ctx.from, lang, realFile)
         ]
 
         // TODO сделать перевод и сравнение результатов с нескольких переводчиков
@@ -79,13 +82,11 @@ commander
           }
         }
 
-        if (result[0]) {
-          try {
-            await writer.writeFile(lang, result[0])
-            printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
-          } catch (e) {
-            printText(e, COLOR_CONSOLE.FgRed)
-          }
+        try {
+          await writer.writeFile(lang, result.length >= 2 ? await mergeObjects(result, realFile) : result[0])
+          printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
+        } catch (e) {
+          printText(e, COLOR_CONSOLE.FgRed)
         }
       }
     }
