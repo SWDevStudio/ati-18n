@@ -1,14 +1,6 @@
 import {Json} from "../types/Json";
 import {prompt} from "inquirer";
-import {I18n} from "i18n";
-import path from "path";
-
-const i18n = new I18n()
-i18n.configure(({
-  locales: ['ru', 'de', 'en'],
-  defaultLocale: 'ru',
-  directory: path.join(__dirname, '/locales')
-}))
+import i18n from "../classes/i18n";
 
 
 export async function mergeObjects(jsons: Json[], realFile: Json) {

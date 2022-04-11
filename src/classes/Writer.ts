@@ -6,14 +6,7 @@ import printText from "../utils/printText";
 import {COLOR_CONSOLE} from "../const/COLOR_CONSOLE";
 import inquirer from "inquirer";
 import generateHash from "../utils/generateHash";
-import {I18n} from "i18n";
-
-const i18n = new I18n()
-i18n.configure(({
-  locales: ['ru', 'de', 'en'],
-  defaultLocale: 'en',
-  directory: path.join(__dirname, '/locales')
-}))
+import i18n from "./i18n";
 
 export default class Writer {
   readonly pathWrite: string

@@ -10,15 +10,7 @@ import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 import {prompt} from "inquirer";
 import Google from "./classes/translators/Google";
 import {mergeObjects} from "./utils/mergeObjects";
-import {I18n} from "i18n";
-import path from "path";
-
-const i18n = new I18n()
-i18n.configure(({
-  locales: ['ru', 'de', 'en'],
-  defaultLocale: 'en',
-  directory: path.join(__dirname, '/locales')
-}))
+import i18n from "./classes/i18n";
 
 
 const commander = program

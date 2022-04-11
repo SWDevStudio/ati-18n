@@ -3,15 +3,7 @@ import {COLOR_CONSOLE} from "../../const/COLOR_CONSOLE";
 import printText from "../../utils/printText";
 import Writer from "../Writer";
 import {DefaultConfig} from "../../const/DEFAULT_CONFIG";
-import {I18n} from "i18n";
-import path from "path";
-
-const i18n = new I18n()
-i18n.configure(({
-  locales: ['ru', 'de', 'en'],
-  defaultLocale: 'en',
-  directory: path.join(__dirname, '/locales')
-}))
+import i18n from "../i18n";
 
 export default class Translator {
   langTo: string
