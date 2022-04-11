@@ -1,5 +1,15 @@
 import {Json} from "../types/Json";
 import {prompt} from "inquirer";
+import {I18n} from "i18n";
+import path from "path";
+
+const i18n = new I18n()
+i18n.configure(({
+  locales: ['ru', 'de', 'en'],
+  defaultLocale: 'ru',
+  directory: path.join(__dirname, '/locales')
+}))
+
 
 export async function mergeObjects(jsons: Json[], realFile: Json) {
   const newJson: Json = JSON.parse(JSON.stringify(jsons[0]))
@@ -14,14 +24,14 @@ export async function mergeObjects(jsons: Json[], realFile: Json) {
           const {response} = await prompt({
             type: 'list',
             name: 'response',
-            message: `Произошел конфликт переводов \n Оригинальный текст: ${realFile[item]}`,
+            message: i18n.__('failMergeObject', { text: realFile[item]} as {text: string}),
             choices: [
               ...translateCollections.map(item => ({
                 name: `${item}`,
                 value: item
               })),
               {
-                name: 'Свой вариант.',
+                name: i18n.__('yourChoice'),
                 value: 'custom'
               }
             ],
@@ -30,7 +40,7 @@ export async function mergeObjects(jsons: Json[], realFile: Json) {
           if (response === 'custom') {
             const {customVariant} = await prompt({
               type: 'input',
-              message: 'Введите свой собственный вариант: ',
+              message: i18n.__('writeYourChoice'),
               name: 'customVariant'
             })
             Json[item] = customVariant

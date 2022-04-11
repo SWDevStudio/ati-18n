@@ -6,6 +6,14 @@ import printText from "../utils/printText";
 import {COLOR_CONSOLE} from "../const/COLOR_CONSOLE";
 import inquirer from "inquirer";
 import generateHash from "../utils/generateHash";
+import {I18n} from "i18n";
+
+const i18n = new I18n()
+i18n.configure(({
+  locales: ['ru', 'de', 'en'],
+  defaultLocale: 'en',
+  directory: path.join(__dirname, '/locales')
+}))
 
 export default class Writer {
   readonly pathWrite: string
@@ -33,13 +41,13 @@ export default class Writer {
     if (existFile) {
 
       const { rewrite } = await inquirer.prompt([
-        { type: 'list', name: 'rewrite', message: `Файл ${fileName}.${extension} уже существует, перезаписать?`, choices: ['yes', 'no'] }
+        { type: 'list', name: 'rewrite', message: i18n.__('fileIsExist', {fileName, extension}), choices: ['yes', 'no'] }
       ])
 
       if (rewrite === 'no') {
         const hash = generateHash(6)
         fs.writeFileSync(`${this.pathWrite}/${fileName}.${hash}.${extension}`, JSON.stringify(write))
-        printText(`Файл создан под именем ${fileName}.${hash}.${extension}`, COLOR_CONSOLE.FgGreen)
+        printText(i18n.__('fileCreateForName', {fileName, hash, extension}), COLOR_CONSOLE.FgGreen)
         return
       }
     }
@@ -50,12 +58,12 @@ export default class Writer {
   readFile(pathRead?: string, softReading?: boolean): Json | null {
     try {
       if (!pathRead && !this.pathRead) {
-        throw new Error('Укажите путь для чтения!')
+        throw new Error(i18n.__('setReadFile'))
       }
       return JSON.parse(fs.readFileSync(pathRead || this.pathRead || '').toString())
     } catch (e) {
       if (!softReading) {
-        printText('Файл для чтения не найден!', COLOR_CONSOLE.FgRed)
+        printText(i18n.__('fileIsNotExist'), COLOR_CONSOLE.FgRed)
         printText(e)
       }
       return null

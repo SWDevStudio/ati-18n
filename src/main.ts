@@ -10,20 +10,30 @@ import {DEFAULT_CONFIG} from "./const/DEFAULT_CONFIG";
 import {prompt} from "inquirer";
 import Google from "./classes/translators/Google";
 import {mergeObjects} from "./utils/mergeObjects";
+import {I18n} from "i18n";
+import path from "path";
+
+const i18n = new I18n()
+i18n.configure(({
+  locales: ['ru', 'de', 'en'],
+  defaultLocale: 'en',
+  directory: path.join(__dirname, '/locales')
+}))
+
 
 const commander = program
 commander
   .version('1.2.0')
-  .description('Скриптовый перевод JSON файлов, при помощи API переводчиков.')
+  .description(i18n.__('descriptionCLI'))
 
 commander
   .command('translate')
-  .description('Создает новый файл с текстами для перевода.')
-  .option('--from <value>', 'С какого языка переводится')
-  .option('--to <value>', 'На какой язык нужен перевод')
-  .option('-r, --read <value>', 'Путь к файлу который нужно перевести. Пример => ./locales/en.json')
-  .option('-w, --patch-write <value>', 'Путь к папке, в которую будет записан файл. Пример => ./locales')
-  .option('--filename <value>', 'Имя файла при сохранении. По умолчанию выбранный язык.')
+  .description(i18n.__('descriptionCLI'))
+  .option('--from <value>', i18n.__('fromLanguage'))
+  .option('--to <value>', i18n.__('toLanguage'))
+  .option('-r, --read <value>', i18n.__('read'))
+  .option('-w, --patch-write <value>', i18n.__('write'))
+  .option('--filename <value>', i18n.__('filename'))
   .action(async (args) => {
 
     const configFile = new Writer().readFile('./ati-18n.config.json', true)
@@ -38,16 +48,16 @@ commander
     const startTranslate = async (lang: string) => {
       if (!ctx.read) {
         if (!ctx.from) {
-          printText('Укажите файл для чтения! Пример => --read ./locales/*.json')
+          printText(i18n.__('errorReadFile'))
           return
         } else {
-          printText(`Файл для чтения не указан, попытка найти ./locales/${ctx.from}.json`)
+          printText(i18n.__('findReadFile', {from: ctx.from}))
           return
         }
       }
 
       if (!ctx.patchWrite)
-        printText('Не указана папка в которую нужно записывать файл, по дефолту выбрана папка ./locales')
+        printText(i18n.__('errorFolder'))
 
       const writer = new Writer({
         pathRead: ctx.read || `./locales/${ctx.from}.json`,
@@ -62,18 +72,15 @@ commander
           new Google(ctx.from, lang, realFile)
         ]
 
-        // TODO сделать перевод и сравнение результатов с нескольких переводчиков
-
         const result: Json[] = []
 
         for (let translator of translators) {
           try {
             result.push(await translator.translate())
           } catch (e: any) {
-            printText(`Что то пошло не так в ${translator.name} при переводе на ${lang}`, COLOR_CONSOLE.FgRed)
-
+            printText(i18n.__('whatError', {name: translator.name, lang}), COLOR_CONSOLE.FgRed)
             const {response} = await prompt<{response: 'yes' | 'no'}>({
-              type: 'list', name: 'response', message: `Желаете узнать подробности?`, choices: ['yes', 'no']
+              type: 'list', name: 'response', message: i18n.__('findDetails'), choices: ['yes', 'no']
             })
             if (response === 'yes') {
               console.log(e)
@@ -84,7 +91,7 @@ commander
 
         try {
           await writer.writeFile(lang, result.length >= 2 ? await mergeObjects(result, realFile) : result[0])
-          printText('Файл успешно записан', COLOR_CONSOLE.FgGreen)
+          printText(i18n.__('successWrite'), COLOR_CONSOLE.FgGreen)
         } catch (e) {
           printText(e, COLOR_CONSOLE.FgRed)
         }
@@ -104,7 +111,7 @@ commander
 
 commander
   .command('generate-config')
-  .description('Создает дефолтный конфигурационный файл для программы')
+  .description(i18n.__('generateConfigDescription'))
   .action(async () => {
     const writer = new Writer({
       pathWrite: './',
@@ -112,12 +119,14 @@ commander
 
     try {
       await writer.writeFile('ati-18n.config', DEFAULT_CONFIG)
-      printText('Создан базовый конфигурационный файл', COLOR_CONSOLE.FgGreen)
+      printText(i18n.__('createConfigFile'), COLOR_CONSOLE.FgGreen)
     } catch (e) {
-      printText('Не удалось, создать конфигурационный файл', COLOR_CONSOLE.FgRed)
+      printText(i18n.__('failCreateConfigFile'), COLOR_CONSOLE.FgRed)
       printText(e)
     }
   })
+
+// TODO  добавить метод который будет генерировать enum файл с ключами для перевода (возможно)
 
 
 commander.parse(process.argv)
