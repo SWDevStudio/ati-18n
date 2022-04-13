@@ -70,12 +70,14 @@ commander
           try {
             result.push(await translator.translate())
           } catch (e: any) {
-            printText(i18n.__('whatError', {name: translator.name, lang}), COLOR_CONSOLE.FgRed)
-            const {response} = await prompt<{response: 'yes' | 'no'}>({
-              type: 'list', name: 'response', message: i18n.__('findDetails'), choices: ['yes', 'no']
-            })
-            if (response === 'yes') {
-              console.log(e)
+            if (ctx.printTranslateError) {
+              printText(i18n.__('whatError', {name: translator.name, lang}), COLOR_CONSOLE.FgRed)
+              const {response} = await prompt<{response: 'yes' | 'no'}>({
+                type: 'list', name: 'response', message: i18n.__('findDetails'), choices: ['yes', 'no']
+              })
+              if (response === 'yes') {
+                console.log(e)
+              }
             }
             //TODO добавить возможность записывать логи программы в отдельный файл, что бы их можно было посмотреть.
           }

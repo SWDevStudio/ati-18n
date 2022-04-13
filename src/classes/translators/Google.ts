@@ -22,7 +22,7 @@ export default class Google extends Translator implements Itranslitor {
         'content-type': 'application/x-www-form-urlencoded',
         'Accept-Encoding': 'application/gzip',
         'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com',
-        'X-RapidAPI-Key': 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
+        'X-RapidAPI-Key': this.configFile?.translatorKeys?.google || 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
       }
     })
   }
