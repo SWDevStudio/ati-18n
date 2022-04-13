@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mergeObjects = void 0;
 const inquirer_1 = require("inquirer");
+const i18n_1 = __importDefault(require("../classes/i18n"));
 function mergeObjects(jsons, realFile) {
     return __awaiter(this, void 0, void 0, function* () {
         const newJson = JSON.parse(JSON.stringify(jsons[0]));
@@ -25,14 +29,14 @@ function mergeObjects(jsons, realFile) {
                         const { response } = yield (0, inquirer_1.prompt)({
                             type: 'list',
                             name: 'response',
-                            message: `Произошел конфликт переводов \n Оригинальный текст: ${realFile[item]}`,
+                            message: i18n_1.default.__('failMergeObject', { text: realFile[item] }),
                             choices: [
                                 ...translateCollections.map(item => ({
                                     name: `${item}`,
                                     value: item
                                 })),
                                 {
-                                    name: 'Свой вариант.',
+                                    name: i18n_1.default.__('yourChoice'),
                                     value: 'custom'
                                 }
                             ],
@@ -40,7 +44,7 @@ function mergeObjects(jsons, realFile) {
                         if (response === 'custom') {
                             const { customVariant } = yield (0, inquirer_1.prompt)({
                                 type: 'input',
-                                message: 'Введите свой собственный вариант: ',
+                                message: i18n_1.default.__('writeYourChoice'),
                                 name: 'customVariant'
                             });
                             Json[item] = customVariant;

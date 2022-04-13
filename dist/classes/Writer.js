@@ -19,6 +19,7 @@ const printText_1 = __importDefault(require("../utils/printText"));
 const COLOR_CONSOLE_1 = require("../const/COLOR_CONSOLE");
 const inquirer_1 = __importDefault(require("inquirer"));
 const generateHash_1 = __importDefault(require("../utils/generateHash"));
+const i18n_1 = __importDefault(require("./i18n"));
 class Writer {
     constructor(options = WRITER_OPTIONS_1.WRITER_OPTIONS) {
         // Смержим с дефолтными настройками, работает только если нет вложенности в опциях!
@@ -38,12 +39,12 @@ class Writer {
             const existFile = fs_1.default.existsSync(`${this.pathWrite}/${fileName}.${extension}`);
             if (existFile) {
                 const { rewrite } = yield inquirer_1.default.prompt([
-                    { type: 'list', name: 'rewrite', message: `Файл ${fileName}.${extension} уже существует, перезаписать?`, choices: ['yes', 'no'] }
+                    { type: 'list', name: 'rewrite', message: i18n_1.default.__('fileIsExist', { fileName, extension }), choices: ['yes', 'no'] }
                 ]);
                 if (rewrite === 'no') {
                     const hash = (0, generateHash_1.default)(6);
                     fs_1.default.writeFileSync(`${this.pathWrite}/${fileName}.${hash}.${extension}`, JSON.stringify(write));
-                    (0, printText_1.default)(`Файл создан под именем ${fileName}.${hash}.${extension}`, COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
+                    (0, printText_1.default)(i18n_1.default.__('fileCreateForName', { fileName, hash, extension }), COLOR_CONSOLE_1.COLOR_CONSOLE.FgGreen);
                     return;
                 }
             }
@@ -53,13 +54,13 @@ class Writer {
     readFile(pathRead, softReading) {
         try {
             if (!pathRead && !this.pathRead) {
-                throw new Error('Укажите путь для чтения!');
+                throw new Error(i18n_1.default.__('setReadFile'));
             }
             return JSON.parse(fs_1.default.readFileSync(pathRead || this.pathRead || '').toString());
         }
         catch (e) {
             if (!softReading) {
-                (0, printText_1.default)('Файл для чтения не найден!', COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
+                (0, printText_1.default)(i18n_1.default.__('fileIsNotExist'), COLOR_CONSOLE_1.COLOR_CONSOLE.FgRed);
                 (0, printText_1.default)(e);
             }
             return null;

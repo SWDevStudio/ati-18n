@@ -19,6 +19,7 @@ const intrapolation_1 = require("../../utils/intrapolation");
 const object_path_set_1 = __importDefault(require("object-path-set"));
 class Google extends Translator_1.default {
     constructor(langFrom, langTo, targetJson) {
+        var _a, _b;
         super(langFrom, langTo, targetJson);
         this.name = 'Google';
         this.axios = axios_1.default.create({
@@ -27,7 +28,7 @@ class Google extends Translator_1.default {
                 'content-type': 'application/x-www-form-urlencoded',
                 'Accept-Encoding': 'application/gzip',
                 'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com',
-                'X-RapidAPI-Key': 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
+                'X-RapidAPI-Key': ((_b = (_a = this.configFile) === null || _a === void 0 ? void 0 : _a.translatorKeys) === null || _b === void 0 ? void 0 : _b.google) || 'fd3f1a1c35mshe2ea65941658536p1f6146jsn0b4018414817'
             }
         });
     }
